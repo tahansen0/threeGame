@@ -15,8 +15,10 @@ export function createPlayer() {
 }
 
 export const position = {
+    oldRow: 0,
+    oldTile: 0,
     currentRow: 0,
-    currentTile: 0,
+    currentTile: 0
 }
 
 export const movesQueue = []
@@ -40,13 +42,17 @@ const directionLookup = {
 }
 
 export function setPosition(player, progress) {
-    let startX = player.position.x
-    let startY = player.position.y
+    
+    let startX = position.oldTile * 42
+    let startY = position.oldRow * 42
     let endX = position.currentTile * 42
     let endY = position.currentRow * 42
-
+    
+    if (Math.round(player.position.x) === endX && Math.round(player.position.y) === endY) return
+    
     player.position.x = THREE.MathUtils.lerp(startX, endX, progress)
     player.position.y = THREE.MathUtils.lerp(startY, endY, progress)
+        
     // player.position.x = position.currentTile * 42
     // player.position.y = position.currentRow * 42
     
@@ -56,6 +62,8 @@ export function stepCompleted() {
     
     //console.log(movesQueue[0])
     const direction = movesQueue.shift()
+    position.oldRow = position.currentRow
+    position.oldTile = position.currentTile
     position.currentTile += directionLookup[direction].x 
     position.currentRow += directionLookup[direction].y 
     

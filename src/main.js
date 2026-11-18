@@ -22,6 +22,7 @@ initializeMap()
 const scene = createScene( camera, player, map)
 const renderer = createRenderer()
 const controller = createControls( camera, renderer)
+console.log(scene.children[3])
 
 controller.mouseButtons = {
     MIDDLE: THREE.MOUSE.ROTATE
@@ -98,14 +99,17 @@ window.addEventListener( 'click', () => {
     selectedObjects[0].updateMatrixWorld(true);
     selectedObjects[0].matrixWorld.decompose(worldPos, worldQuat, worldScale);
     //console.log(worldPos, oldPos)
-
+    //camera.position.x = 100
+    controller.update()
     //console.log(position)
     //console.log(movesQueue)
 
     if (movesQueue.length > 0) {
         resetQueue()
     }
-    buildQueue(worldPos, oldPos)
+    let xDifference = (worldPos.x - oldPos.x)/42 
+    let yDifference = (worldPos.y - oldPos.y)/42
+    buildQueue(xDifference, yDifference)
     console.log(movesQueue)
     
     
@@ -118,29 +122,24 @@ let tickCount = 0
 const TICK_INTERVAL = 0.6;
 let lastTickTime = 0;
 
-let hasStepped = false;
-
 const tick = () => {
-    camera.lookAt(player.position) 
+    camera.position.x = player.position.x + 300
+    camera.position.y = player.position.y - 300
     controller.target = player.position
     controller.update()
+   
     const elapsed = moveClock.getElapsedTime();
-
     const progress = Math.min((elapsed - lastTickTime) / TICK_INTERVAL, 1);
-    if (hasStepped) {
-        setPosition(player, progress);
-    }
-
+    setPosition(player, progress);
+    
     while (elapsed - lastTickTime >= TICK_INTERVAL) {
         if (movesQueue.length > 0) {
             stepCompleted();
-            hasStepped = true
         }
         lastTickTime += TICK_INTERVAL;
         tickCount++;
     }
 
-    
     effectComposer.render();
     requestAnimationFrame(tick);
 };

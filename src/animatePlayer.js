@@ -33,16 +33,9 @@ function moveY(yDifference) {
     
 }
 
-export function buildQueue(endPos, startPos) {
-    if (vec3Equal(endPos, startPos)) return
-    let startX = startPos.x / 42
-    let startY = startPos.y / 42
-
-    let endX = endPos.x / 42
-    let endY = endPos.y / 42
-
-    let xDifference = endX - startX 
-    let yDifference = endY - startY  
+export function buildQueue(xDifference, yDifference) {
+    // let xDifference = endX - startX 
+    // let yDifference = endY - startY  
 
     let absValueX = Math.abs(xDifference)
     let absValueY = Math.abs(yDifference)
