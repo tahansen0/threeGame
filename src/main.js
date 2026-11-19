@@ -136,10 +136,11 @@ moveClock.start()
 let tickCount = 0
 const TICK_INTERVAL = 0.6;
 let lastTickTime = 0;
+let isWalking = false
 
 const tick = () => {
     const delta = moveClock.getDelta();
-    if (mixer) mixer.update(delta); 
+    if (mixer && isWalking) mixer.update(delta); 
 
     camera.position.x = player.scene.position.x + 300
     camera.position.y = player.scene.position.y - 300
@@ -153,10 +154,12 @@ const tick = () => {
     while (elapsed - lastTickTime >= TICK_INTERVAL) {
 	console.log(movesQueue.length)
         if (movesQueue.length > 0) {
-	    
+            isWalking = true
             stepCompleted();
         }
-	
+        if (movesQueue.length === 0) {
+            isWalking = false
+        }
 
         lastTickTime += TICK_INTERVAL;
         tickCount++;
