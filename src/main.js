@@ -15,6 +15,9 @@ import { createGUI } from "./components/gui.js";
 import { buildQueue } from "./animatePlayer.js";
 import { resetRendererAndSceneState } from "three/src/renderers/common/RendererUtils.js";
 
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+
+
 const camera = createCamera()
 const player = createPlayer()
 
@@ -31,6 +34,26 @@ controller.mouseButtons = {
 let selectedObjects = [];
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
+
+const loader = new GLTFLoader();
+let mixer;
+const clock = new THREE.Clock();
+
+loader.load('/untitled.glb', (gltf) => {
+
+ const model = gltf.scene;
+  model.scale.setScalar(5);          // adjust until it looks right
+  model.position.set(0, 0, 0);
+  model.rotation.x = Math.PI / 2;     // see note below
+  scene.add(model);
+
+  console.log(gltf.animations);       // should list your clip(s)
+  console.log(gltf.animations[0].duration)
+  mixer = new THREE.AnimationMixer(model);
+  gltf.animations.forEach((clip) => {
+    mixer.clipAction(clip).play()
+  })
+})
 
 
 /**
@@ -123,6 +146,9 @@ const TICK_INTERVAL = 0.6;
 let lastTickTime = 0;
 
 const tick = () => {
+    const delta = clock.getDelta();
+    if (mixer) mixer.update(delta);
+
     camera.position.x = player.position.x + 300
     camera.position.y = player.position.y - 300
     controller.target = player.position
