@@ -1,17 +1,22 @@
 import * as THREE from "three"
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
 
-export function createPlayer() {
-    const body = new THREE.Mesh(
-        new THREE.BoxGeometry(15, 15, 20),
-        new THREE.MeshLambertMaterial({
-            color: "white",
-            flatShading: true
-        })
-    )
-    body.position.z = 10
+async function loadModel(url) {
+    const loader = new GLTFLoader();
+    const gltf = await loader.loadAsync(url)
+    return gltf
+}
 
-    return body
+export async function createPlayer() {
+    const model = await loadModel('./untitled.glb');
+    model.scene.scale.setScalar(5);          
+    model.scene.position.set(0, 0, 0);
+    model.scene.rotation.x = Math.PI / 2; 
+    console.log(model.animations);      
+    console.log(model.animations[0].duration)
+
+    return model
 }
 
 export const position = {
@@ -48,10 +53,10 @@ export function setPosition(player, progress) {
     let endX = position.currentTile * 42
     let endY = position.currentRow * 42
     
-    if (Math.round(player.position.x) === endX && Math.round(player.position.y) === endY) return
+    if (Math.round(player.scene.position.x) === endX && Math.round(player.scene.position.y) === endY) return
     
-    player.position.x = THREE.MathUtils.lerp(startX, endX, progress)
-    player.position.y = THREE.MathUtils.lerp(startY, endY, progress)
+    player.scene.position.x = THREE.MathUtils.lerp(startX, endX, progress)
+    player.scene.position.y = THREE.MathUtils.lerp(startY, endY, progress)
         
     // player.position.x = position.currentTile * 42
     // player.position.y = position.currentRow * 42
