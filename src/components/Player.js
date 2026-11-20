@@ -23,7 +23,8 @@ export const position = {
     oldRow: 0,
     oldTile: 0,
     currentRow: 0,
-    currentTile: 0
+    currentTile: 0,
+    isStopped: true
 }
 
 export const movesQueue = []
@@ -53,8 +54,12 @@ export function setPosition(player, progress) {
     let endX = position.currentTile * 42
     let endY = position.currentRow * 42
     
-    if (Math.round(player.scene.position.x) === endX && Math.round(player.scene.position.y) === endY) return
+    if (Math.round(player.scene.position.x) === endX && Math.round(player.scene.position.y) === endY) {
+	position.isStopped = true
+	return
+    }
     
+    position.isStopped = false    
     player.scene.position.x = THREE.MathUtils.lerp(startX, endX, progress)
     player.scene.position.y = THREE.MathUtils.lerp(startY, endY, progress)
         

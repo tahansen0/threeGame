@@ -23,10 +23,27 @@ const player = await createPlayer()
 console.log(player)
 
 let mixer = new THREE.AnimationMixer(player.scene);
-player.animations.forEach((clip) => {
-    mixer.clipAction(clip).play()
-})
 
+function Walking() {
+    console.log("Walk")
+    player.animations.forEach((clip) => {
+        const action = mixer.clipAction(clip);
+	action.paused = false;
+        action.play();
+    })
+}
+
+function StopWalking() {
+    console.log("Stop")
+
+    player.animations.forEach((clip) => {
+        const action = mixer.clipAction(clip);
+        action.reset();        // Resets time to 0 and unpauses
+        action.paused = true;  // Immediately pauses on frame 0
+    });
+    
+    mixer.update(0);           // Forces the 3D model to visually snap to frame 0
+}
 
 initializeMap()
 const scene = createScene( camera, player.scene, map)
@@ -136,11 +153,13 @@ moveClock.start()
 let tickCount = 0
 const TICK_INTERVAL = 0.6;
 let lastTickTime = 0;
-let isWalking = false
 
 const tick = () => {
     const delta = moveClock.getDelta();
-    if (mixer && isWalking) mixer.update(delta); 
+    console.log(position.isStopped) 
+    if (!position.isStopped) Walking()
+    if (position.isStopped) StopWalking()
+    if (mixer) mixer.update(delta); 
 
     camera.position.x = player.scene.position.x + 300
     camera.position.y = player.scene.position.y - 300
@@ -154,13 +173,8 @@ const tick = () => {
     while (elapsed - lastTickTime >= TICK_INTERVAL) {
 	console.log(movesQueue.length)
         if (movesQueue.length > 0) {
-            isWalking = true
             stepCompleted();
         }
-        if (movesQueue.length === 0) {
-            isWalking = false
-        }
-
         lastTickTime += TICK_INTERVAL;
         tickCount++;
     }
