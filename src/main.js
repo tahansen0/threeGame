@@ -25,7 +25,7 @@ console.log(player)
 let mixer = new THREE.AnimationMixer(player.scene);
 
 function Walking() {
-    console.log("Walk")
+    //console.log("Walk")
     player.animations.forEach((clip) => {
         const action = mixer.clipAction(clip);
 	action.paused = false;
@@ -34,7 +34,7 @@ function Walking() {
 }
 
 function StopWalking() {
-    console.log("Stop")
+    //console.log("Stop")
 
     player.animations.forEach((clip) => {
         const action = mixer.clipAction(clip);
@@ -127,7 +127,7 @@ window.addEventListener( 'click', () => {
     oldPos.y = position.currentRow * 42
     oldPos.z = 1.5
     //worldpos
-
+    
     selectedObjects[0].updateMatrixWorld(true);
     selectedObjects[0].matrixWorld.decompose(worldPos, worldQuat, worldScale);
     //console.log(worldPos, oldPos)
@@ -135,14 +135,15 @@ window.addEventListener( 'click', () => {
     controller.update()
     //console.log(position)
     //console.log(movesQueue)
-
+    position.destinationRow = worldPos.y
+    position.destinationTile = worldPos.x
     if (movesQueue.length > 0) {
         resetQueue()
     }
     let xDifference = (worldPos.x - oldPos.x)/42 
     let yDifference = (worldPos.y - oldPos.y)/42
     buildQueue(xDifference, yDifference)
-    console.log(movesQueue)
+    //console.log(movesQueue)
     
     
 }) 
@@ -171,7 +172,7 @@ const tick = () => {
     setPosition(player, progress);
      
     while (elapsed - lastTickTime >= TICK_INTERVAL) {
-	console.log(movesQueue.length)
+	//console.log(movesQueue.length, position.isStopped)
         if (movesQueue.length > 0) {
             stepCompleted();
         }
