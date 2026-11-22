@@ -28,7 +28,7 @@ function Walking() {
     //console.log("Walk")
     player.animations.forEach((clip) => {
         const action = mixer.clipAction(clip);
-	action.paused = false;
+	    action.paused = false;
         action.play();
     })
 }
@@ -157,7 +157,7 @@ let lastTickTime = 0;
 
 const tick = () => {
     const delta = moveClock.getDelta();
-    console.log(position.isStopped) 
+    //console.log(position.isStopped) 
     if (!position.isStopped) Walking()
     if (position.isStopped) StopWalking()
     if (mixer) mixer.update(delta); 
@@ -173,9 +173,9 @@ const tick = () => {
      
     while (elapsed - lastTickTime >= TICK_INTERVAL) {
 	//console.log(movesQueue.length, position.isStopped)
-        if (movesQueue.length > 0) {
-            stepCompleted();
-        }
+        // if (movesQueue.length > 0) {
+        stepCompleted();
+        // }
         lastTickTime += TICK_INTERVAL;
         tickCount++;
     }

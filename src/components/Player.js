@@ -26,7 +26,8 @@ export const position = {
     currentTile: 0,
     isStopped: true,
     destinationRow: 0,
-    destinationTile: 0
+    destinationTile: 0,
+    stepIndex: 0
 }
 
 export const movesQueue = []
@@ -57,13 +58,14 @@ export function setPosition(player, progress) {
     let endY = position.currentRow * 42
     //console.log(position.destinationRow, position.destinationTile)
     position.isStopped = Math.hypot(player.scene.position.x - position.destinationTile, player.scene.position.y - position.destinationRow) < 0.5
-    if (Math.abs(player.scene.position.x - endX) < 0.5 && Math.abs(player.scene.position.y - endY) < 0.5) return
+
+    player.scene.position.x = THREE.MathUtils.lerp(startX, endX, progress)
+    player.scene.position.y = THREE.MathUtils.lerp(startY, endY, progress)
+
     //if (Math.round(player.scene.position.x) === endX && Math.round(player.scene.position.y) === endY) {
     //if (Math.round(player.scene.position.x) === position.destinationTile && Math.round(player.scene.position.y) === position.destinationRow) return
     //position.isStopped = false
-    player.scene.position.x = THREE.MathUtils.lerp(startX, endX, progress)
-    player.scene.position.y = THREE.MathUtils.lerp(startY, endY, progress)
-        
+
     // player.position.x = position.currentTile * 42
     // player.position.y = position.currentRow * 42
     
@@ -75,8 +77,13 @@ export function stepCompleted() {
     const direction = movesQueue.shift()
     position.oldRow = position.currentRow
     position.oldTile = position.currentTile
-    position.currentTile += directionLookup[direction].x 
-    position.currentRow += directionLookup[direction].y 
+    if (direction) {
+        position.stepIndex += 1
+        position.currentTile += directionLookup[direction].x 
+        position.currentRow += directionLookup[direction].y 
+    }
+    
+    
     
 
     
