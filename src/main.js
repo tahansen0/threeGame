@@ -22,29 +22,6 @@ const camera = createCamera()
 const player = await createPlayer()
 console.log(player)
 
-let mixer = new THREE.AnimationMixer(player.scene);
-
-function Walking() {
-    //console.log("Walk")
-    player.animations.forEach((clip) => {
-        const action = mixer.clipAction(clip);
-	    action.paused = false;
-        action.play();
-    })
-}
-
-function StopWalking() {
-    //console.log("Stop")
-
-    player.animations.forEach((clip) => {
-        const action = mixer.clipAction(clip);
-        action.reset();        // Resets time to 0 and unpauses
-        action.paused = true;  // Immediately pauses on frame 0
-    });
-    
-    mixer.update(0);           // Forces the 3D model to visually snap to frame 0
-}
-
 initializeMap()
 const scene = createScene( camera, player.scene, map)
 const renderer = createRenderer()
@@ -151,24 +128,56 @@ window.addEventListener( 'click', () => {
 
 createGUI(outlinePass)
 moveClock.start()
+
 let tickCount = 0
 const TICK_INTERVAL = 0.6;
 let lastTickTime = 0;
+let delta = 0
+
+let mixer = new THREE.AnimationMixer(player.scene);
+
+function Walking(progress) {
+    //console.log("Walk")
+    player.animations.forEach((clip) => {
+        const action = mixer.clipAction(clip);
+        action.play();
+        action.paused = true; // we drive time manually
+        const fraction = (position.stepIndex + progress) / 4;
+        console.log(progress, position.stepIndex + progress)
+        action.time = fraction * clip.duration;
+    });
+    mixer.update(0); // apply pose without advancing time
+}
+
+function StopWalking() {
+    console.log("Stop")
+    position.stepIndex = 0
+    player.animations.forEach((clip) => {
+        const action = mixer.clipAction(clip);
+        action.reset();        // Resets time to 0 and unpauses
+        action.paused = true;  // Immediately pauses on frame 0
+    });
+    
+    mixer.update(0);           // Forces the 3D model to visually snap to frame 0
+}
+
 
 const tick = () => {
-    const delta = moveClock.getDelta();
+    
+    const elapsed = moveClock.getElapsedTime();
+    const progress = Math.min((elapsed - lastTickTime) / TICK_INTERVAL, 1);
+    delta = moveClock.getDelta();
     //console.log(position.isStopped) 
-    if (!position.isStopped) Walking()
+    if (!position.isStopped) Walking(progress)
     if (position.isStopped) StopWalking()
-    if (mixer) mixer.update(delta); 
+    
 
     camera.position.x = player.scene.position.x + 300
     camera.position.y = player.scene.position.y - 300
     controller.target = player.scene.position
     controller.update()
    
-    const elapsed = moveClock.getElapsedTime();
-    const progress = Math.min((elapsed - lastTickTime) / TICK_INTERVAL, 1);
+    
     setPosition(player, progress);
      
     while (elapsed - lastTickTime >= TICK_INTERVAL) {
@@ -176,6 +185,7 @@ const tick = () => {
         // if (movesQueue.length > 0) {
         stepCompleted();
         // }
+        position.stepIndex = (position.stepIndex + 1) % 4
         lastTickTime += TICK_INTERVAL;
         tickCount++;
     }

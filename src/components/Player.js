@@ -78,7 +78,7 @@ export function stepCompleted() {
     position.oldRow = position.currentRow
     position.oldTile = position.currentTile
     if (direction) {
-        position.stepIndex += 1
+        
         position.currentTile += directionLookup[direction].x 
         position.currentRow += directionLookup[direction].y 
     }
