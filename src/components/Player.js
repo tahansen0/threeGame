@@ -27,7 +27,8 @@ export const position = {
     isStopped: true,
     destinationRow: 0,
     destinationTile: 0,
-    stepIndex: 0
+    stepIndex: 0,
+    tickStart: false
 }
 
 export const movesQueue = []
@@ -78,9 +79,11 @@ export function stepCompleted() {
     position.oldRow = position.currentRow
     position.oldTile = position.currentTile
     if (direction) {
-        
+        console.log("here")
+	position.tickStart = true 
         position.currentTile += directionLookup[direction].x 
-        position.currentRow += directionLookup[direction].y 
+        position.currentRow += directionLookup[direction].y
+	position.stepIndex = (position.stepIndex + 1) % 4 
     }
     
     

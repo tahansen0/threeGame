@@ -8,7 +8,7 @@ export function createRenderer() {
         antialias: true,
         canvas: canvas
     })
-    renderer.setPixelRatio(window.devicePixelRatio)
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1));
     renderer.setSize(window.innerWidth, window.innerHeight)
     return renderer
 

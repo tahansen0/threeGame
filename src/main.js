@@ -143,7 +143,7 @@ function Walking(progress) {
         action.play();
         action.paused = true; // we drive time manually
         const fraction = (position.stepIndex + progress) / 4;
-        console.log(progress, position.stepIndex + progress)
+        console.log(position.stepIndex, progress, player.scene.position.x) 
         action.time = fraction * clip.duration;
     });
     mixer.update(0); // apply pose without advancing time
@@ -151,6 +151,7 @@ function Walking(progress) {
 
 function StopWalking() {
     console.log("Stop")
+    position.tickStart = false
     position.stepIndex = 0
     player.animations.forEach((clip) => {
         const action = mixer.clipAction(clip);
@@ -168,7 +169,7 @@ const tick = () => {
     const progress = Math.min((elapsed - lastTickTime) / TICK_INTERVAL, 1);
     delta = moveClock.getDelta();
     //console.log(position.isStopped) 
-    if (!position.isStopped) Walking(progress)
+    if (!position.isStopped && position.tickStart) Walking(progress)
     if (position.isStopped) StopWalking()
     
 
@@ -181,11 +182,7 @@ const tick = () => {
     setPosition(player, progress);
      
     while (elapsed - lastTickTime >= TICK_INTERVAL) {
-	//console.log(movesQueue.length, position.isStopped)
-        // if (movesQueue.length > 0) {
         stepCompleted();
-        // }
-        position.stepIndex = (position.stepIndex + 1) % 4
         lastTickTime += TICK_INTERVAL;
         tickCount++;
     }
